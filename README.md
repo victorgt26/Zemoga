@@ -8,8 +8,15 @@ The following additional libraries have been used:
 
 The IDE used was AndroidStudio BumBlebee 2021.1.1 Patch 3
 
-The shared_preferences library was chosen because it is a simple application, and there was no need to use databases like sqflite.
+The shared_preferences library was chosen to store posts locally, because it is a simple application, and there was no need to use databases like sqflite.
 
+The source code is in the lib folder.
+* model: DTO files to process the services information.
+* ApiService: Service that calls the Rest APIs and saves the results in the local memory of the device (Shared Preferences)
+* constants: Configuration parameters, endpoints of the APIs used in the App.
+* main: Main Screen
+* posts: Screen where the list of Posts is displayed
+* post_detail: Screen where the detail of the Selected Post is displayed
 
 To run the application you just have to open it and follow these steps:
 

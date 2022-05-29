@@ -53,3 +53,5 @@ Select android or IOS emulatorOpen the project in Android Studio
 ```
 Run the app
 ```
+![alt text](https://github.com/victorgt26/Zemoga/blob/main/Screen1.png?raw=true)
+![alt text](https://github.com/victorgt26/Zemoga/blob/main/Screen2.png?raw=true)

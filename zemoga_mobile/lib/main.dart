@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:zemoga_mobile/posts.dart';
 import 'dart:convert';
-import 'http_service.dart';
+import 'ApiService.dart';
 import 'model/post.dart';
 
 void main() {

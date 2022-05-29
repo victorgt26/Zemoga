@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'model/post.dart';
 import 'model/user.dart';
 import 'model/comment.dart';
-import 'http_service.dart';
+import 'ApiService.dart';
 
 class PostDetailPage extends StatefulWidget {
   const PostDetailPage({super.key, required this.post, required this.user});
@@ -15,10 +15,19 @@ class PostDetailPage extends StatefulWidget {
 }
 
 class _PostDetailPageState extends State<PostDetailPage> {
-  Icon favoriteIcon = const Icon(Icons.star_outline);
+  late Icon favoriteIcon;
+
+  void refreshIconFavorite(){
+    if (widget.post.favorite) {
+      favoriteIcon = const Icon(Icons.star);
+    } else {
+      favoriteIcon = const Icon(Icons.star_outline);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    refreshIconFavorite();
     final topContentText = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -93,17 +102,24 @@ class _PostDetailPageState extends State<PostDetailPage> {
             onPressed: () {
               setState(() {
                 widget.post.favorite = !widget.post.favorite;
-                if (widget.post.favorite) {
-                  print("favorito");
-                  favoriteIcon = const Icon(Icons.star_outline);
-                } else {
-                  print("no favorito");
-                  favoriteIcon = const Icon(Icons.star);
-                }
+                HttpService().upgradeFavoritePosts(widget.post).then((value) => refreshIconFavorite());
               });
             },
           ),
         ),
+        Positioned(
+          left: MediaQuery.of(context).size.width * 0.80,
+          top: MediaQuery.of(context).size.height * 0.05,
+          child: IconButton(
+            color: Colors.redAccent,
+            iconSize: 40,
+            icon: const Icon(Icons.delete),
+            tooltip: 'Remove Post',
+            onPressed: () {
+              showMyDialog();
+            },
+          ),
+        )
       ],
     ));
 
@@ -181,6 +197,45 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmation'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Are you sure you want to delete this post?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+
+                setState(() {
+                  HttpService().removePostSP(widget.post);
+                  Navigator.pop(context);
+
+                });
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        );
+      },
     );
   }
 }

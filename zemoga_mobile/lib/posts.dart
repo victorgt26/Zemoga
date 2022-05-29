@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'http_service.dart';
+import 'ApiService.dart';
 import 'model/post.dart';
 import 'model/user.dart';
 import 'post_detail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostsPage extends StatefulWidget {
   const PostsPage({Key? key}) : super(key: key);
@@ -12,16 +15,26 @@ class PostsPage extends StatefulWidget {
 }
 
 class _PostsPageState extends State<PostsPage> {
-  late List<Post> posts = [];
+  late Future<List<Post>> posts;
   late List<User>? users = [];
+
+  @override
+  void initState() {
+    super.initState();
+    posts = HttpService().getPosts();
+    getUsers();
+  }
 
   void getUsers() async {
     users = (await HttpService().getUsers());
   }
 
+  void getPosts() async {
+    posts = HttpService().getPosts();
+  }
+
   @override
   Widget build(BuildContext context) {
-    getUsers();
     ListTile makeListTile(Post post) => ListTile(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -30,7 +43,8 @@ class _PostsPageState extends State<PostsPage> {
             decoration: const BoxDecoration(
                 border: Border(
                     right: BorderSide(width: 1.0, color: Colors.white24))),
-            child: const Icon(Icons.autorenew, color: Colors.white),
+            child: Icon(post.favorite ? Icons.star : Icons.star_outline,
+                color: Colors.white),
           ),
           title: Text(
             post.title,
@@ -39,8 +53,8 @@ class _PostsPageState extends State<PostsPage> {
           ),
           trailing: const Icon(Icons.keyboard_arrow_right,
               color: Colors.white, size: 30.0),
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => PostDetailPage(
@@ -48,6 +62,9 @@ class _PostsPageState extends State<PostsPage> {
                           user: users!
                               .firstWhere((user) => user.id == post.userId),
                         )));
+            setState(() {
+              getPosts();
+            });
           },
         );
 
@@ -67,14 +84,26 @@ class _PostsPageState extends State<PostsPage> {
       title: const Text("Posts"),
       actions: <Widget>[
         IconButton(
-          icon: const Icon(Icons.list),
-          onPressed: () {},
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            setState(() {
+              HttpService()
+                  .removeSP("posts")
+                  .then((value) => posts = HttpService().getPosts());
+            });
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () {
+            showMyDialog();
+          },
         )
       ],
     );
 
     final makeBody = FutureBuilder(
-      future: HttpService().getPosts(),
+      future: posts,
       builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
         if (snapshot.hasData) {
           List<Post>? posts = snapshot.data;
@@ -92,39 +121,47 @@ class _PostsPageState extends State<PostsPage> {
       },
     );
 
-    final makeBottom = Container(
-      height: 55.0,
-      child: BottomAppBar(
-        color: const Color.fromRGBO(58, 66, 86, 1.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home, color: Colors.white),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.blur_on, color: Colors.white),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.hotel, color: Colors.white),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.account_box, color: Colors.white),
-              onPressed: () {},
-            )
-          ],
-        ),
-      ),
-    );
-
     return Scaffold(
       backgroundColor: const Color.fromRGBO(58, 66, 86, 1.0),
       appBar: topAppBar,
       body: makeBody,
-      bottomNavigationBar: makeBottom,
+    );
+  }
+
+  Future<void> showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmation'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Are you sure to delete all posts?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+
+                setState(() {
+                  posts = HttpService().removeAllPostSP();
+                  Navigator.pop(context);
+                });
+              },
+            ),
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        );
+      },
     );
   }
 }

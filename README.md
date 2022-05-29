@@ -10,7 +10,7 @@ The IDE used was AndroidStudio BumBlebee 2021.1.1 Patch 3
 
 The shared_preferences library was chosen to store posts locally, because it is a simple application, and there was no need to use databases like sqflite.
 
-The source code is in the lib folder.
+The source code is in the zemoga_mobile/lib folder.
 * model: DTO files to process the services information.
 * ApiService: Service that calls the Rest APIs and saves the results in the local memory of the device (Shared Preferences)
 * constants: Configuration parameters, endpoints of the APIs used in the App.
@@ -30,7 +30,7 @@ https://github.com/victorgt26/Zemoga.git
 
 **Step 2:**
 
-Go to project root and execute the following command in console to get the required dependencies:
+Go to project root (zemoga_mobile) and execute the following command in console to get the required dependencies:
 
 ```
 flutter pub get
@@ -39,7 +39,7 @@ flutter pub get
 **Step 3:**
 
 ```
-Open the project in Android Studio
+Open the project in Android Studio (zemoga_mobile)
 ```
 
 **Step 4:**

@@ -1,11 +1,9 @@
-import 'package:flutter/foundation.dart';
-
 class Post {
   final int userId;
   final int id;
   final String title;
   final String body;
-
+  bool favorite=false;
   Post({
     required this.userId,
     required this.id,

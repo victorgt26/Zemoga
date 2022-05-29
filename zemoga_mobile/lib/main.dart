@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:zemoga_mobile/posts.dart';
 import 'dart:convert';
 import 'http_service.dart';
-import 'post_model.dart';
+import 'model/post.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,9 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: new ThemeData(primaryColor: Color.fromRGBO(58, 66, 86, 1.0)),
       home: PostsPage(),
     );
   }
